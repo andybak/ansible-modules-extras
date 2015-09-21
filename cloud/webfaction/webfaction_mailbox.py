@@ -100,6 +100,7 @@ def main():
     )
 
     mailbox_list = [x['mailbox'] for x in webfaction.list_mailboxes(session_id)]
+    existing_mailbox = mailbox_name in mailbox_list
 
     result = {}
     
