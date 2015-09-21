@@ -99,7 +99,6 @@ def main():
         module.params['login_password']
     )
 
-    mailbox_list = webfaction.list_mailboxes(session_id)
     mailbox_list = [x['mailbox'] for x in webfaction.list_mailboxes(session_id)]
 
     result = {}
