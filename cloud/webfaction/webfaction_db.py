@@ -75,6 +75,19 @@ options:
         description:
             - The machine name to use (optional for accounts with only one machine)
         required: false
+        
+    postgis:
+        description:
+            - Enable postgis addon for Postgres
+        choices: BOOLEANS 
+        default: 'false'
+            
+    tsearch:
+        description:
+            - Enable full-text search addon for Postgres
+        choices: BOOLEANS 
+        default: 'false'
+        
 '''
 
 EXAMPLES = '''
@@ -112,6 +125,8 @@ def main():
             login_name = dict(required=True),
             login_password = dict(required=True),
             machine = dict(required=False, default=False),
+            postgis = dict(required=False, choices=BOOLEANS, default=False),
+            tsearch = dict(required=False, choices=BOOLEANS, default=False),
         ),
         supports_check_mode=True
     )
@@ -119,6 +134,8 @@ def main():
     db_state = module.params['state']
     db_type  = module.params['type']
     db_passwd = module.params['password']
+    db_postgis = module.boolean(module.params['postgis'])
+    db_tsearch = module.boolean(module.params['tsearch'])
 
     if module.params['machine']:
         session_id, account = webfaction.login(
@@ -166,6 +183,20 @@ def main():
                     session_id, db_name, db_type, db_passwd
                 )
             )
+            
+            if db_postgis and db_type=='postgresql':
+                result.update(
+                   webfaction.enable_addon(
+                        session_id, db_name, 'postgis'
+                    )
+                )
+
+            if db_tsearch and db_type=='postgresql':
+                result.update(
+                   webfaction.enable_addon(
+                        session_id, db_name, 'tsearch'
+                    )
+                )
 
     elif db_state == 'absent':
 
@@ -197,4 +228,3 @@ def main():
 
 from ansible.module_utils.basic import *
 main()
-
